@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Emila (nerfed + font & color update)</title>
+    <meta name="description" content="A simpler birthday greeting for Emila">
+    <!-- keep same fonts but fewer external libs -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- keeping Playfair and Dancing Script only as fallback, but we'll override with new fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Comfortaa:wght@400;600&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- no GSAP, no particles, no AOS – nerfed -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', 'Comfortaa', sans-serif;  /* changed font */
+            background: #0f0f1a;
+            color: #EAD7F5;  /* softer lavender for body text */
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3, .handwriting {
+            font-family: 'Comfortaa', 'Quicksand', cursive;  /* modern rounded font */
+            color: #FFC8E8;  /* pastel pink for headings */
+        }
+        .handwriting {
+            font-family: 'Dancing Script', cursive;  /* keep signature style but new color */
+            color: #FFB3C6;  
+        }
+
+        /* nerfed night sky: static simple stars, no moon glow, no floating elements */
+        .night-sky {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b0b14;
+            z-index: -1;
+        }
+        .stars {
+            position: absolute; width: 100%; height: 100%;
+        }
+        .star {
+            position: absolute; background-color: #aaa; border-radius: 50%;
+            width: 2px; height: 2px; opacity: 0.5;
+        }
+        .mountains {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 20%;
+            background: #1a1a2e;
+            opacity: 0.5;
+        }
+        .content {
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        footer {
+            text-align: center; padding: 30px; margin-top: 40px;
+            color: #B6E2D9; border-top: 1px solid #333;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .btn-nerf {
+            display: inline-block; padding: 10px 24px;
+            background: #4a4e6b; color: #FCE4F0; border-radius: 30px;
+            text-decoration: none; font-weight: 600; border: none;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .btn-nerf:hover { background: #5a5e7b; }
+
+        /* cake: shiny colors from previous version */
+        .birthday-cake svg {
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+        }
+        .cake-layer1 { fill: #FFB347; } 
+        .cake-layer2 { fill: #59C7EB; } 
+        .cake-layer3 { fill: #FF6F91; } 
+        .candle { fill: #F4E542; }       
+        .flame { fill: #FF9500; }         
+        .plate { fill: #3a3a5e; }          
+        .frosting {
+            stroke: #FFFEF2; 
+            stroke-width: 4; 
+            fill: none; 
+            filter: url(#glow); 
+            stroke-opacity: 0.9;
+        }
+        .frosting2 {
+            stroke: #FFF9E6; 
+            stroke-width: 3; 
+            fill: none; 
+            stroke-opacity: 0.8;
+        }
+        .frosting3 {
+            stroke: #FFFFF0; 
+            stroke-width: 2; 
+            fill: none; 
+            stroke-opacity: 0.7;
+        }
+        .shiny-dot {
+            fill: #FFFDE7;
+            filter: url(#glow);
+            opacity: 0.9;
+        }
+        /* remove all extra interactive junk */
+        #confetti-container, .minimized-player-controls, #music-player, .moon-button,
+        .floating-elements, .cosmic-wormhole-btn, .theme-button, .scroll-down,
+        .feature i, .heart, .custom-cursor, .sparkle, .click-sparkle, .sparkle-trail {
+            display: none !important;
+        }
+
+        nav {
+            background: #1a1a2e; padding: 1rem 0; position: sticky; top:0; z-index:10;
+        }
+        .nav-link { color: #CBB5E6; margin: 0 1rem; text-decoration: none; font-family: 'Quicksand', sans-serif; }
+        .nav-link:hover { color: #FFC8E8; }
+
+        .md\:hidden { display: none; }
+
+        .wishes-simple {
+            display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;
+            margin-top: 30px;
+        }
+        .wish-item {
+            background: #262338; padding: 20px; border-radius: 12px; width: 220px;
+            text-align: center; color: #EAD7F5; font-family: 'Quicksand', sans-serif;
+        }
+        .wish-item h3 { color: #FFC8E8; margin-bottom: 8px; font-size: 1.3rem; font-family: 'Comfortaa', sans-serif; }
+
+        /* additional text color overrides */
+        .text-gray-300 { color: #D5C7E8 !important; }
+        .text-purple-400 { color: #D9B0FF !important; }
+        .text-pink-400 { color: #FFB3D9 !important; }
+        .bg-pink-400 { background-color: #FFA5C8 !important; }
+        h1, h2, h3, .handwriting, .font-bold { color: #FFC8E8; }
+        .content p { color: #ECDEF5; line-height: 1.7; }
+        .content .handwriting { color: #FFB3C6; }
+    </style>
+</head>
+<body>
+
+    <div class="night-sky">
+        <div class="stars" id="stars"></div>
+        <div class="mountains"></div>
+    </div>
+
+    <!-- Nav – only three links -->
+    <nav>
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <span class="text-xl font-bold handwriting" style="color:#FFB3D9;">For Emila</span>
+                <div class="flex items-center space-x-6">
+                    <a href="#home" class="nav-link text-sm">Home</a>
+                    <a href="#message" class="nav-link text-sm">My Message</a>
+                    <a href="#wishes" class="nav-link text-sm">Wishes</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HOME section with cake (shiny colors unchanged) -->
+    <section id="home" style="padding: 60px 0 40px;">
+        <div class="container">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-4 " style="color:#FFB3D9;">Happy Birthday, Emila!</h1>
+                    <p class="text-lg md:text-xl mb-6" style="color:#D5C7E8;">Just a simple page to say you're awesome. Hope your day is filled with good vibes.</p>
+                    <a href="#message" class="btn-nerf inline-block">Read message</a>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="birthday-cake">
+                        <svg width="320" height="320" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                                    <feMerge>
+                                        <feMergeNode in="offsetblur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <radialGradient id="shinyGradient1" cx="30%" cy="30%" r="60%">
+                                    <stop offset="0%" stop-color="#FFE5B4" />
+                                    <stop offset="80%" stop-color="#FFB347" />
+                                </radialGradient>
+                                <radialGradient id="shinyGradient2" cx="30%" cy="30%" r="60%">
+                                    <stop offset="0%" stop-color="#B0E9FF" />
+                                    <stop offset="80%" stop-color="#59C7EB" />
+                                </radialGradient>
+                                <radialGradient id="shinyGradient3" cx="30%" cy="30%" r="60%">
+                                    <stop offset="0%" stop-color="#FFB3C6" />
+                                    <stop offset="80%" stop-color="#FF6F91" />
+                                </radialGradient>
+                            </defs>
+                            <ellipse cx="200" cy="350" rx="120" ry="20" fill="#2f2f42" />
+                            <ellipse cx="200" cy="340" rx="100" ry="10" fill="#373753" />
+                            <rect x="100" y="220" width="200" height="80" rx="10" fill="url(#shinyGradient1)" />
+                            <rect x="120" y="180" width="160" height="40" rx="8" fill="url(#shinyGradient2)" />
+                            <rect x="140" y="150" width="120" height="30" rx="6" fill="url(#shinyGradient3)" />
+                            <path d="M100 220 Q150 210 200 220 Q250 210 300 220" stroke="#FFFEF2" stroke-width="4" fill="none" filter="url(#glow)" stroke-opacity="0.9" />
+                            <path d="M120 180 Q160 170 200 180 Q240 170 280 180" stroke="#FFF9E6" stroke-width="3" fill="none" filter="url(#glow)" stroke-opacity="0.8" />
+                            <path d="M140 150 Q170 145 200 150 Q230 145 260 150" stroke="#FFFFF0" stroke-width="2" fill="none" filter="url(#glow)" stroke-opacity="0.7" />
+                            <rect x="180" y="100" width="10" height="50" fill="#F4E542" filter="url(#glow)" />
+                            <rect x="210" y="100" width="10" height="50" fill="#F4E542" filter="url(#glow)" />
+                            <path d="M185 90 Q190 70 195 90 Q190 100 185 90" fill="#FF9500" filter="url(#glow)" />
+                            <path d="M215 90 Q220 70 225 90 Q220 100 215 90" fill="#FF9500" filter="url(#glow)" />
+                            <circle cx="140" cy="240" r="5" fill="#FFFDE7" filter="url(#glow)" opacity="0.9" />
+                            <circle cx="180" cy="235" r="4" fill="#FFFDE7" filter="url(#glow)" opacity="0.8" />
+                            <circle cx="230" cy="245" r="5" fill="#FFFDE7" filter="url(#glow)" opacity="0.9" />
+                            <circle cx="270" cy="230" r="4" fill="#FFFDE7" filter="url(#glow)" opacity="0.8" />
+                            <circle cx="150" cy="200" r="4" fill="#FFFDE7" filter="url(#glow)" opacity="0.8" />
+                            <circle cx="250" cy="195" r="5" fill="#FFFDE7" filter="url(#glow)" opacity="0.9" />
+                            <circle cx="200" cy="170" r="4" fill="#FFFDE7" filter="url(#glow)" opacity="0.7" />
+                            <text x="200" y="200" font-family="'Dancing Script', cursive" font-size="24" fill="#392E4A" text-anchor="middle" font-weight="bold">Emila</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Personal Message – with updated font & colors -->
+    <section id="message" style="padding: 40px 0;">
+        <div class="container">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold mb-2" style="color:#FFC8E8;">For You, Emila</h2>
+                <div class="w-24 h-1 bg-pink-400 mx-auto" style="background:#FFA5C8;"></div>
+            </div>
+            <div class="content">
+                <div class="space-y-5 text-lg">
+                    <p class="text-center font-medium" style="color:#ECDEF5;">My Son, Emila</p>
+                    <p style="color:#ECDEF5;">Hey, on your special day I just want to say how great it is to have you in my life. You bring good vibes wherever you go, and things honestly feel lighter when you’re around.</p>
+                    <p style="color:#ECDEF5;">You’re the kind of friend who makes even simple moments fun. Whether we’re talking nonstop or just studying quietly, it always feels comfortable and easy with you.</p>
+                    <p class="text-center font-medium handwriting text-2xl" style="color:#FFB3C6;">"Good friends like you make ordinary days memorable too."</p>
+                    <p style="color:#ECDEF5;">I hope this birthday brings you plenty of laughs, good memories, and things that genuinely make you happy. May this year treat you well and give you lots to smile about.</p>
+                    <p class="text-right font-medium" style="color:#ECDEF5;">Best wishes always,<br>pew pew</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wishes section – updated font/color -->
+    <section id="wishes" style="padding: 40px 0 60px;">
+        <div class="container">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-2" style="color:#FFC8E8;">Birthday Wishes</h2>
+                <div class="w-24 h-1 bg-pink-400 mx-auto" style="background:#FFA5C8;"></div>
+                <p class="text-xl mt-4 max-w-xl mx-auto" style="color:#D5C7E8;">A few simple wishes for you</p>
+            </div>
+
+            <div class="wishes-simple">
+                <div class="wish-item">
+                    <h3>Joy</h3>
+                    <p>Endless laughter and happy moments.</p>
+                </div>
+                <div class="wish-item">
+                    <h3>Adventure</h3>
+                    <p>New places, new memories.</p>
+                </div>
+                <div class="wish-item">
+                    <h3>Dreams</h3>
+                    <p>May all your dreams come true.</p>
+                </div>
+                <div class="wish-item">
+                    <h3>Love</h3>
+                    <p>Surrounded by warmth and care.</p>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center max-w-2xl mx-auto">
+                <div class="content">
+                    <h3 class="text-2xl font-bold mb-4" style="color:#D9B0FF;">My Greatest Wish</h3>
+                    <p class="text-lg" style="color:#ECDEF5;">More than anything, I hope you learn to see yourself the way others do – as someone genuinely talented, kind, and great to be around. I hope this year reminds you how much you matter.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer – updated colors -->
+    <footer>
+        <p class="mb-2" style="color:#B6E2D9;">Made with Little Moons and Twinkly Stars, for someone even rarer :)</p>
+        <p style="color:#B6E2D9;">PewPew - A gift from the Brats</p>
+    </footer>
+
+    <!-- minimal JS: static stars, smooth scroll, active nav (unchanged) -->
+    <script>
+        (function(){
+            const starsContainer = document.getElementById('stars');
+            if (starsContainer) {
+                for (let i = 0; i < 60; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.width = Math.random() * 2 + 1 + 'px';
+                    star.style.height = star.style.width;
+                    star.style.left = Math.random() * 100 + '%';
+                    star.style.top = Math.random() * 100 + '%';
+                    star.style.opacity = 0.3 + Math.random() * 0.3;
+                    starsContainer.appendChild(star);
+                }
+            }
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if(target) target.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            window.addEventListener('scroll', () => {
+                let currentId = '';
+                sections.forEach(section => {
+                    const top = section.offsetTop - 100;
+                    const bottom = top + section.offsetHeight;
+                    if (window.scrollY >= top && window.scrollY < bottom) {
+                        currentId = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('text-pink-400');
+                    if (link.getAttribute('href') === `#${currentId}`) {
+                        link.classList.add('text-pink-400');
+                    } else {
+                        link.style.color = '';
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
